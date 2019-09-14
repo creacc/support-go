@@ -52,7 +52,7 @@ func WrapTX(tx *sql.Tx) *TXContext {
 	}
 }
 
-func (c *SqlContext) Query(query string, args ...interface{}) (*sql.Rows, error) {
+func (c *SqlContext) Query(query string, args ...interface{}) (*Rows, error) {
 	log.Logger.Debug("Query SQL: %s", query)
 	log.Logger.Debug("Query Args: %v", args)
 	stmt, err := c.d.Prepare(query)
@@ -61,7 +61,11 @@ func (c *SqlContext) Query(query string, args ...interface{}) (*sql.Rows, error)
 		log.Logger.Error("Query Err: %s in %s", err, query)
 		return nil, err
 	}
-	return stmt.Query(args...)
+	rows, err := stmt.Query(args...)
+	if err != nil {
+		return nil, err
+	}
+	return &Rows{rows: rows}, nil
 }
 
 func (c *SqlContext) Exec(query string, args ...interface{}) (sql.Result, error) {
