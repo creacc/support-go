@@ -1,0 +1,23 @@
+mysql:
+  arthur:
+    ip: "10.179.181.125"
+    port: "3306"
+    user: "root"
+    password: "123456"
+  gaia:
+    ip: "10.179.181.125"
+    port: "3306"
+    user: "root"
+    password: "123456"
+
+redis:
+  ip: "127.0.0.1"
+  port: "6379"
+
+gift:
+  upload:
+    ip: "10.88.128.23"
+    port: "8000"
+  query:
+    ip: "10.88.128.23"
+    port: "8001"
