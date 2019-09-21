@@ -17,15 +17,16 @@ func NewConn(conf Config) *Conn {
 }
 
 func (c *Conn) connectToDatabase(database string) (db *sql.DB, err error) {
-	log.Logger.Debug("connect to db")
 	db, err = sql.Open("mysql", c.conf.getDataSource(database))
 	if err != nil {
+		log.Logger.Debug("connect failed %v", err)
 		return nil, err
 	}
-	db.SetMaxIdleConns(500)  //SetMaxIdleConns用于设置闲置的连接数。
-	db.SetMaxOpenConns(1000) //SetMaxOpenConns用于设置最大打开的连接数，默认值为0表示不限制。
+	//db.SetMaxIdleConns(500)  //SetMaxIdleConns用于设置闲置的连接数。
+	//db.SetMaxOpenConns(1000) //SetMaxOpenConns用于设置最大打开的连接数，默认值为0表示不限制。
 	err = db.Ping()
 	if err != nil {
+		log.Logger.Debug("connect failed %v", err)
 		return nil, err
 	}
 	log.Logger.Debug("connect success")

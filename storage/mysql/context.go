@@ -12,8 +12,8 @@ type Driver interface {
 }
 
 type Context interface {
-	Query(query string, args ...interface{}) (*sql.Rows, error)
-	Exec(query string, args ...interface{}) (sql.Result, error)
+	Query(query string, args ...interface{}) *QueryResult
+	Exec(query string, args ...interface{}) *ExecResult
 	close() error
 }
 
@@ -52,32 +52,28 @@ func WrapTX(tx *sql.Tx) *TXContext {
 	}
 }
 
-func (c *SqlContext) Query(query string, args ...interface{}) (*Rows, error) {
+func (c *SqlContext) Query(query string, args ...interface{}) *QueryResult {
 	log.Logger.Debug("Query SQL: %s", query)
 	log.Logger.Debug("Query Args: %v", args)
 	stmt, err := c.d.Prepare(query)
 	if err != nil {
 		c.failed = true
 		log.Logger.Error("Query Err: %s in %s", err, query)
-		return nil, err
+		return queryResult(nil, err)
 	}
-	rows, err := stmt.Query(args...)
-	if err != nil {
-		return nil, err
-	}
-	return &Rows{rows: rows}, nil
+	return queryResult(stmt.Query(args...))
 }
 
-func (c *SqlContext) Exec(query string, args ...interface{}) (sql.Result, error) {
+func (c *SqlContext) Exec(query string, args ...interface{}) *ExecResult {
 	log.Logger.Debug("Exec SQL: %s", query)
 	log.Logger.Debug("Exec Args: %v", args)
 	stmt, err := c.d.Prepare(query)
 	if err != nil {
 		c.failed = true
-		log.Logger.Error("Exec Err: %s in %s", err, query)
-		return nil, err
+		log.Logger.Error("Prepare Err: %s in %s", err, query)
+		return execResult(nil, err)
 	}
-	return stmt.Exec(args...)
+	return execResult(stmt.Exec(args...))
 }
 
 func (c *DBContext) close() error {
